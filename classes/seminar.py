@@ -1,9 +1,10 @@
 from classes.db import DataBase
 from classes.person_classen import Docent, Participant
 from interfaces.callable import Nameable
+from interfaces.serializable import Serializable
 
 
-class Seminar(Nameable):
+class Seminar(Nameable, Serializable):
     def __init__(self, title: str, date: str, duration: int, max_participant_count: int, place: str):
         self.__title: str = title
         self.__date: str = date
@@ -13,6 +14,9 @@ class Seminar(Nameable):
         self.__docents: DataBase = DataBase()
         self.__participants: DataBase = DataBase()
 
+
+    def get_dict(self) -> dict:
+        ...
 
     def add_docent(self, docent_name: str, docent_db: DataBase):
 

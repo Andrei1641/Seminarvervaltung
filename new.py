@@ -54,3 +54,6 @@ while True:
         print(e)
     except OverflowError as e:
         print(e)
+    except IndexError:
+        print('the query is not full')
+
