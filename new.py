@@ -1,12 +1,11 @@
+import json
+
 from collector import Information
 import shlex
 
 
 information = Information()
 
-
-def end():
-    ...
 
 while True:
     try:
@@ -57,3 +56,8 @@ while True:
     except IndexError:
         print('the query is not full')
 
+j: dict = information.get_dict()
+
+if j:
+    with open('data.json', "w") as f:
+        json.dump(j, f, indent=4)

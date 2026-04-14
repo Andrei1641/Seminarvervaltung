@@ -16,7 +16,25 @@ class Seminar(Nameable, Serializable):
 
 
     def get_dict(self) -> dict:
-        ...
+
+
+        course_dict: dict = {
+                                self.get_name(): {
+                                                    'course info' : {
+                                                                        'title' : self.__title,
+                                                                        'date' : self.__date,
+                                                                        'duration' : self.__duration,
+                                                                        'max participant count' : self.__max_participant_count,
+                                                                        'place' : self.__place
+                                                                    },
+                                                    'persons inside' : {
+                                                                        'docents' : self.__docents.get_names(),
+                                                                        'participants' : self.__participants.get_names()
+                                                                       }
+                                                 }
+                             }
+
+        return course_dict
 
     def add_docent(self, docent_name: str, docent_db: DataBase):
 

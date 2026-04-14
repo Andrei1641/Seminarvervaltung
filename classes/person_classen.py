@@ -54,7 +54,7 @@ class Docent(Person, Nameable, Serializable):
 
     def get_dict(self) -> dict:
         docent_dict = super().get_dict()
-        docent_dict[self.get_name()] = {'theme' : self.__list_an_themes}
+        docent_dict[self.get_name()]['theme'] = self.__list_an_themes
 
         return docent_dict
 
