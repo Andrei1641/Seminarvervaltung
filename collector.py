@@ -1,3 +1,7 @@
+import json
+import os.path
+from json import JSONDecodeError
+
 from classes.person_classen import Docent, Participant
 from classes.seminar import Seminar
 from factories.persons_factory import PersonFactory
@@ -11,6 +15,52 @@ class Information(Serializable):
         self.__docent_db = DataBase()
         self.__participant_db = DataBase()
         self.__seminar_db = DataBase()
+
+
+    def deserialize(self):
+        data: dict = {}
+        if os.path.exists('data.json'):
+            try:
+                with open('data.json', "r") as f:
+                    data = json.load(f)
+            except JSONDecodeError:
+                return
+
+        for i in data['all docents'].values():
+            docent = PersonFactory.create_docent(i['first name'], i['second name'], i['email address'], i['theme'])
+            self.__docent_db.insert_in_db(docent)
+
+
+        for i in data['all participants'].values():
+            participant = PersonFactory.create_participant(i['first name'], i['second name'], i['email address'])
+            self.__participant_db.insert_in_db(participant)
+
+
+        for i in data['all courses'].values():
+            course_info = i['course info']
+            course: Seminar = SeminarFactory.create_seminar(course_info['title'], course_info['date'], course_info['duration'],
+                                                   course_info['max participant count'], course_info['place'])
+
+            self.__seminar_db.insert_in_db(course)
+
+            persons_inside = i['persons inside']
+
+            # add docents
+            docents_inside: str = persons_inside['docents']
+            docent_name_inside: list[str] = docents_inside.split(', ')
+
+            for j in docent_name_inside:
+                self.add_docent_to_course(j, course.get_name())
+
+            #add participants
+            participants_inside: str = persons_inside['participants']
+            participant_name_inside: list[str] = participants_inside.split(', ')
+
+            for j in participant_name_inside:
+                self.add_participant_to_course(j, course.get_name())
+
+
+
 
     @staticmethod
     def __db_get_objects(db: DataBase) -> list[Serializable]:
@@ -27,11 +77,11 @@ class Information(Serializable):
         #docent dict
         all_docents: list[Serializable] = Information.__db_get_objects(self.__docent_db)
 
-        docents_dict: dict = {}
+        docents_dict: dict = {'all docents' : {}}
 
         if all_docents != [0]:
             for i in all_docents:
-                docents_dict['all docents'] = i.get_dict()
+                docents_dict['all docents'].update(i.get_dict())
         else:
             docents_dict['all docents'] = ''
 
@@ -39,11 +89,11 @@ class Information(Serializable):
         #participant dict
         all_participants: list[Serializable] = Information.__db_get_objects(self.__participant_db)
 
-        participants_dict: dict = {}
+        participants_dict: dict = {'all participants' : {}}
 
         if all_participants != [0]:
             for i in all_participants:
-                participants_dict['all participants'] = i.get_dict()
+                participants_dict['all participants'].update(i.get_dict())
         else:
             participants_dict['all participants'] = ''
 
@@ -51,11 +101,11 @@ class Information(Serializable):
         #course dict
         all_courses: list[Serializable] = Information.__db_get_objects(self.__seminar_db)
 
-        courses_dict: dict = {}
+        courses_dict: dict = {'all courses' : {}}
 
         if all_courses != [0]:
             for i in all_courses:
-                courses_dict['all courses'] = i.get_dict()
+                courses_dict['all courses'].update(i.get_dict())
         else:
             courses_dict['all courses'] = ''
 

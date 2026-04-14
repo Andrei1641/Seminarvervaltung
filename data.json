@@ -1,0 +1,40 @@
+{
+    "all docents": {
+        "G G": {
+            "first name": "G",
+            "second name": "G",
+            "email address": "f@",
+            "theme": [
+                "mat",
+                " bio"
+            ]
+        }
+    },
+    "all participants": {
+        "L L": {
+            "first name": "L",
+            "second name": "L",
+            "email address": "d@"
+        },
+        "D D": {
+            "first name": "D",
+            "second name": "D",
+            "email address": "d@"
+        }
+    },
+    "all courses": {
+        "F": {
+            "course info": {
+                "title": "F",
+                "date": "2000-5-5-5-5-5",
+                "duration": 5,
+                "max participant count": 5,
+                "place": "f"
+            },
+            "persons inside": {
+                "docents": "G G",
+                "participants": "L L, D D"
+            }
+        }
+    }
+}

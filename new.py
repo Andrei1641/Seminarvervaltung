@@ -6,6 +6,8 @@ import shlex
 
 information = Information()
 
+information.deserialize()
+
 
 while True:
     try:
@@ -54,6 +56,8 @@ while True:
     except OverflowError as e:
         print(e)
     except IndexError:
+        print('the query is not full')
+    except TypeError:
         print('the query is not full')
 
 j: dict = information.get_dict()
