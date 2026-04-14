@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from interfaces.callable import Nameable
+from interfaces.nameable import Nameable
 from interfaces.serializable import Serializable
 
 
@@ -30,7 +30,6 @@ class Person(ABC):
                                                   }
                              }
         return d
-
 
 
     @abstractmethod

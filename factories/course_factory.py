@@ -1,6 +1,6 @@
-from classes.seminar import Seminar
+from classes.course import Course
 
-class SeminarFactory:
+class CourseFactory:
 
     @staticmethod
     def __date_check(date: str) -> str:
@@ -39,17 +39,17 @@ class SeminarFactory:
 
 
     @staticmethod
-    def create_seminar(title: str, date: str, duration: int, max_participant_count: int, place: str) -> Seminar:
+    def create_course(title: str, date: str, duration: int, max_participant_count: int, place: str) -> Course:
 
         if not title.strip():
             raise ValueError('title can not be empty')
-        if not place:
+        if not place.strip():
             raise ValueError('place can not be empty')
         if duration <= 0:
             raise ValueError('duration need to be higher than 0')
         if max_participant_count <= 0:
             raise ValueError('max participant count need to be higher than 0')
 
-        date = SeminarFactory.__date_check(date)
+        date = CourseFactory.__date_check(date)
 
-        return Seminar(title, date, duration, max_participant_count, place)
+        return Course(title, date, duration, max_participant_count, place)

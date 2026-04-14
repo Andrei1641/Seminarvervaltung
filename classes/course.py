@@ -1,10 +1,10 @@
 from classes.db import DataBase
 from classes.person_classen import Docent, Participant
-from interfaces.callable import Nameable
+from interfaces.nameable import Nameable
 from interfaces.serializable import Serializable
 
 
-class Seminar(Nameable, Serializable):
+class Course(Nameable, Serializable):
     def __init__(self, title: str, date: str, duration: int, max_participant_count: int, place: str):
         self.__title: str = title
         self.__date: str = date

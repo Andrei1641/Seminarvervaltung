@@ -50,7 +50,9 @@ class PersonFactory:
 
     @staticmethod
     def create_participant(first_name: str, second_name: str, email_address: str) -> Participant:
+
         first_name, second_name, email_address = PersonFactory.__persons_adjustments(first_name, second_name, email_address)
+
         return Participant(first_name, second_name, email_address)
 
 

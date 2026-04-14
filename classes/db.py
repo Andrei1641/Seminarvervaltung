@@ -1,5 +1,5 @@
 from types import NoneType
-from interfaces.callable import Nameable
+from interfaces.nameable import Nameable
 
 from classes.person_classen import *
 

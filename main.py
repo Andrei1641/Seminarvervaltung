@@ -1,26 +1,68 @@
-from factories.persons_factory import PersonFactory
-from factories.seminar_factory import SeminarFactory
-from classes.db import DataBase
+import json
+
+from collector import Information
+import shlex
 
 
-dozent_db = DataBase()
-teilnehmer_db = DataBase()
+information = Information()
 
-a = PersonFactory.create_docent('And', 'Sor', 'fsf@gmail.com', ['bio', 'mat'])
-c = PersonFactory.create_docent('Tnd', 'Nor', 'fsf@gmail.com', ['bio', 'mat'])
-b = PersonFactory.create_participant('And', 'Sor', 'fsf@gmail.com')
-t = PersonFactory.create_participant('Qnd', 'Lor', 'fsf@gmail.com')
+information.deserialize()
 
-dozent_db.insert_in_db(a)
-dozent_db.insert_in_db(c)
 
-teilnehmer_db.insert_in_db(b)
-teilnehmer_db.insert_in_db(t)
+while True:
+    try:
+        query: str = str(input('write your query: '))
 
-mat_sem = SeminarFactory.create_seminar('Math', '2005-10-30-20-43-43', 30, 10, 'klass 25')
+        if query == 'end':
+            break
 
-mat_sem.add_participant('Sor And', teilnehmer_db)
-mat_sem.add_docent('Nor Tnd', dozent_db)
-mat_sem.add_docent('Sor And', dozent_db)
+        query_modules: list[str] = shlex.split(query)
 
-print(a)
+        action = query_modules[0]
+        target = query_modules[1]
+        args = query_modules[2:]
+
+        states: dict = {
+                        'create' : {
+                                    'docent' : information.docent_create,
+                                    'participant' : information.participant_create,
+                                    'course' : information.course_create
+                                    },
+                        'add':     {
+                                    'docent' : information.add_docent_to_course,
+                                    'participant' : information.add_participant_to_course
+                                    },
+                        'show':    {
+                                    'all' : information.show_all,
+                                    'course' : information.show_course
+                                   },
+                        'delete':   {
+                                    'from db' : information.delete_from_db,
+                                    'from course' : information.delete_from_course,
+                                    'course' : information.delete_course
+                                    },
+                        'info':     {
+                                    'docent' : information.info_docent,
+                                    'participant' : information.info_participant,
+                                    'course' : information.info_course
+                                    }
+                        }
+
+        states[action][target](*args)
+
+    except ValueError as e:
+        print(e)
+    except OverflowError as e:
+        print(e)
+    except IndexError:
+        print('the query is not full')
+    except TypeError:
+        print('the query is not full')
+    except Exception as e:
+        print('something gone wrong')
+
+j: dict = information.get_dict()
+
+if j:
+    with open('data.json', "w") as f:
+        json.dump(j, f, indent=4)

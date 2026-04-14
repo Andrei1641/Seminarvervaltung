@@ -3,13 +3,13 @@ import unittest
 from classes.db import DataBase
 from classes.person_classen import Participant, Docent
 from factories.persons_factory import PersonFactory
-from factories.seminar_factory import SeminarFactory
+from factories.course_factory import CourseFactory
 
 
 class SeminarTest(unittest.TestCase):
     def setUp(self):
         max_p: int = 9
-        self.sem = SeminarFactory.create_seminar('Math', '2005-10-30-20-43-43', 30, max_p, 'klass 25')
+        self.sem = CourseFactory.create_course('Math', '2005-10-30-20-43-43', 30, max_p, 'klass 25')
 
         self.db_p: DataBase = DataBase()
         self.db_d: DataBase = DataBase()
@@ -57,7 +57,7 @@ class SeminarTest(unittest.TestCase):
                 self.sem.add_docent(i.get_name(), self.db_d)
 
     def test_seminar_str(self):
-        semimar = SeminarFactory.create_seminar('Titel Name', '2005-10-30-20-43-43', 10, 10, 'klass 25')
+        semimar = CourseFactory.create_course('Titel Name', '2005-10-30-20-43-43', 10, 10, 'klass 25')
 
         result = str(semimar)
 

@@ -1,6 +1,6 @@
 import unittest
 
-from factories.seminar_factory import SeminarFactory
+from factories.course_factory import CourseFactory
 
 
 class SeminarIniTest(unittest.TestCase):
@@ -10,7 +10,7 @@ class SeminarIniTest(unittest.TestCase):
 
         for i in titel:
             with self.assertRaises(ValueError):
-                SeminarFactory.create_seminar(i, '2005-10-30-20-43-43', 30, 10, 'klass 25')
+                CourseFactory.create_course(i, '2005-10-30-20-43-43', 30, 10, 'klass 25')
 
     def test_date_init(self):
         date = ['200-10-30-20-43-43', '2005-11-31-20-43-43',
@@ -18,8 +18,8 @@ class SeminarIniTest(unittest.TestCase):
 
         for i in date:
             with self.assertRaises(ValueError):
-                SeminarFactory.create_seminar('Titel Name', i, 30, 10, 'klass 25')
+                CourseFactory.create_course('Titel Name', i, 30, 10, 'klass 25')
 
     def test_ints_init(self):
         with self.assertRaises(ValueError):
-            SeminarFactory.create_seminar('Titel Name', '2005-10-30-20-43-43', -1, 10, 'klass 25')
+            CourseFactory.create_course('Titel Name', '2005-10-30-20-43-43', -1, 10, 'klass 25')
