@@ -37,8 +37,8 @@ while True:
                                     'course' : information.show_course
                                    },
                         'delete':   {
-                                    'from db' : information.delete_from_db,
-                                    'from course' : information.delete_from_course,
+                                    'from_db' : information.delete_from_db,
+                                    'from_course' : information.delete_from_course,
                                     'course' : information.delete_course
                                     },
                         'info':     {

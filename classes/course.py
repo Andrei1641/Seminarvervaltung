@@ -1,3 +1,6 @@
+import copy
+from classes.data_time import DateTim
+
 from classes.db import DataBase
 from classes.person_classen import Docent, Participant
 from interfaces.nameable import Nameable
@@ -5,15 +8,28 @@ from interfaces.serializable import Serializable
 
 
 class Course(Nameable, Serializable):
-    def __init__(self, title: str, date: str, duration: int, max_participant_count: int, place: str):
+    def __init__(self, title: str, date: DateTim, duration: int, max_participant_count: int, place: str):
         self.__title: str = title
-        self.__date: str = date
-        self.__duration: int = duration
+        self.__date: DateTim = date
+        self.__duration: int = duration      #min
         self.__max_participant_count: int = max_participant_count
         self.__place: str = place
         self.__docents: DataBase = DataBase()
         self.__participants: DataBase = DataBase()
+        self.__time_room = self.adjust_time_room()
 
+
+    def get_time_room(self):
+        return self.__time_room
+
+    def adjust_time_room(self) -> tuple[DateTim, DateTim]:
+
+        course_start = self.__date
+
+        course_end = copy.copy(self.__date)
+        course_end.add_time(minutes=self.__duration)
+
+        return course_start, course_end
 
     def get_dict(self) -> dict:
 
@@ -22,7 +38,7 @@ class Course(Nameable, Serializable):
                                 self.get_name(): {
                                                     'course info' : {
                                                                         'title' : self.__title,
-                                                                        'date' : self.__date,
+                                                                        'date' : str(self.__date),
                                                                         'duration' : self.__duration,
                                                                         'max participant count' : self.__max_participant_count,
                                                                         'place' : self.__place
@@ -44,6 +60,8 @@ class Course(Nameable, Serializable):
             raise OverflowError(f'the seminar "{self.__title}" is already full for docents')
 
         docent = docent_db.get(docent_name)
+
+
 
         if not docent:
             raise ValueError(f'there is no such a docent: {docent_name}, there are: {docent_db.get_names()}')
@@ -67,11 +85,15 @@ class Course(Nameable, Serializable):
 
 
     def delete_docent(self, docent_name: str):
+        docent: Docent = self.__docents.get(docent_name)
+        docent.free_up_time(self.__time_room)
         self.__docents.pop(docent_name)
 
 
     def delete_participant(self, participant_name: str):
-        self.__docents.pop(participant_name)
+        participant: Participant = self.__participants.get(participant_name)
+        participant.free_up_time(self.__time_room)
+        self.__participants.pop(participant_name)
 
     def get_name(self) -> str:
         return self.__title
@@ -85,7 +107,7 @@ class Course(Nameable, Serializable):
     def __str__(self) -> str:
         title = f'Titel: {self.__title}'
         docents = f'Dozierend: {self.__docents.get_names()}'
-        d = self.__date.split('-')
+        d = str(self.__date).split('-')
         date = f'Datum: {d[0]}-{d[1]}-{d[2]} um {d[3]}:{d[4]}:{d[5]} Uhr'
         duration = f'Dauer: {self.__duration} Minuten'
         place = f'Ort: {self.__place}'

@@ -1,43 +1,8 @@
 from classes.course import Course
+from classes.data_time import DateTim
+from factories.date_time_factory import DateTimeFactory
 
 class CourseFactory:
-
-    @staticmethod
-    def __date_check(date: str) -> str:
-        s = date.split('-')
-
-        if len(s) != 6:
-            raise ValueError('date has inappropriate format (YYYY-MM-DD-HH-MM-SS)')
-
-        for i in s:
-            if not i.isdigit():
-                raise ValueError('date can not consist letter')
-            if int(i) < 0:
-                raise ValueError('date can not be negative')
-
-        if len(s[0]) != 4:
-            raise ValueError('it is out of observing years')
-
-        mon = int(s[1])
-        day = int(s[2])
-        months: list[int] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-
-        if mon > 12:
-            raise ValueError('the months can not be higher then 12')
-
-        if day > months[mon-1]:
-            raise ValueError(f'the days can not be higher then {months[mon-1]} in {mon} month')
-
-        if int(s[3]) > 23:
-            raise ValueError('the hours can not be higher then 23')
-        if int(s[4]) > 59:
-            raise ValueError('the minutes can not be higher then 59')
-        if int(s[5]) > 59:
-            raise ValueError('the seconds can not be higher then 59')
-
-        return date
-
-
     @staticmethod
     def create_course(title: str, date: str, duration: int, max_participant_count: int, place: str) -> Course:
 
@@ -50,6 +15,6 @@ class CourseFactory:
         if max_participant_count <= 0:
             raise ValueError('max participant count need to be higher than 0')
 
-        date = CourseFactory.__date_check(date)
+        datetime: DateTim = DateTimeFactory.create_date_time(date.strip())
 
-        return Course(title, date, duration, max_participant_count, place)
+        return Course(title.strip(), datetime, duration, max_participant_count, place.strip())

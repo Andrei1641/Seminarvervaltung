@@ -12,6 +12,7 @@ class PersonFactory:
             if i.isdigit():
                 raise ValueError('name can not consist digit')
 
+        name = name.strip()
         name = name.capitalize()
         return name
 

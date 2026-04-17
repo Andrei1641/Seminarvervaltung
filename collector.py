@@ -1,7 +1,9 @@
 import json
 import os.path
 from json import JSONDecodeError
+import copy
 
+from classes.data_time import DateTim
 from classes.person_classen import Docent, Participant
 from classes.course import Course
 from factories.persons_factory import PersonFactory
@@ -31,7 +33,11 @@ class Information(Serializable):
         if data['all docents'] != '':
             for i in data['all docents'].values():
                 docent = PersonFactory.create_docent(i['first name'], i['second name'], i['email address'], i['theme'])
+                # if i['booked time']:
+                #     docent.deserialize_booked_time(i['booked time'])
+
                 self.__docent_db.insert_in_db(docent)
+
 
         if data['all participants'] != '':
             for i in data['all participants'].values():
@@ -161,6 +167,13 @@ class Information(Serializable):
         if not course:
             raise ValueError(f'there is no such a course: {course_title}, there are: {self.__course_db.get_names()}')
 
+        #book time docent
+        docent: Docent = self.__docent_db.get(docent_name)
+
+        course_start, course_end = course.get_time_room()
+
+        docent.book_time(course_start, course_end, course_title)
+
         course.add_docent(docent_name, self.__docent_db)
 
 
@@ -168,6 +181,13 @@ class Information(Serializable):
         course: Course = self.__course_db.get(course_title)
         if not course:
             raise ValueError(f'there is no such a course: {course_title}, there are: {self.__course_db.get_names()}')
+
+        # book time participant
+        participant: Participant = self.__participant_db.get(participant_name)
+
+        course_start, course_end = course.get_time_room()
+
+        participant.book_time(course_start, course_end, course_title)
 
         course.add_participant(participant_name, self.__participant_db)
 
@@ -203,23 +223,38 @@ class Information(Serializable):
         if person_type == 'participant':
             self.__participant_db.pop(person_name)
             seminar_names = self.__course_db.get_names()
-            seminar_names = seminar_names.split(', ')
 
-            for name in seminar_names:
-                s_db: Course = self.__course_db.get(name)
-                s_db.delete_participant(person_name)
+            if seminar_names:
+                seminar_names = seminar_names.split(', ')
+                #can be optimized (each person has name of course,that he visit)
+                for name in seminar_names:
+                    s_db: Course = self.__course_db.get(name)
+                    s_db.delete_participant(person_name)
 
         if person_type == 'docent':
             self.__docent_db.pop(person_name)
             seminar_names = self.__course_db.get_names()
-            seminar_names = seminar_names.split(', ')
-
-            for name in seminar_names:
-                s_db: Course = self.__course_db.get(name)
-                s_db.delete_docent(person_name)
+            if seminar_names:
+                seminar_names = seminar_names.split(', ')
+                # can be optimized (each person has name of course,that he visit)
+                for name in seminar_names:
+                    s_db: Course = self.__course_db.get(name)
+                    s_db.delete_docent(person_name)
 
 
     def delete_course(self, course_title: str):
+        course: Course = self.__course_db.get(course_title)
+
+        docents_names: str = course.get_docents_names()
+        d = docents_names.split(', ')
+        for i in d:
+            self.delete_from_course('docent', i, course_title)
+
+        participants_names: str = course.get_participant_names()
+        p = participants_names.split(', ')
+        for i in p:
+            self.delete_from_course('participant', i, course_title)
+
         self.__course_db.pop(course_title)
 
 
