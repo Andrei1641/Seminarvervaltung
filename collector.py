@@ -168,13 +168,13 @@ class Information(Serializable):
             raise ValueError(f'there is no such a course: {course_title}, there are: {self.__course_db.get_names()}')
 
         #book time docent
+        course.add_docent(docent_name, self.__docent_db)
+
         docent: Docent = self.__docent_db.get(docent_name)
 
         course_start, course_end = course.get_time_room()
 
         docent.book_time(course_start, course_end, course_title)
-
-        course.add_docent(docent_name, self.__docent_db)
 
 
     def add_participant_to_course(self, participant_name: str, course_title: str):
@@ -183,13 +183,15 @@ class Information(Serializable):
             raise ValueError(f'there is no such a course: {course_title}, there are: {self.__course_db.get_names()}')
 
         # book time participant
+        course.add_participant(participant_name, self.__participant_db)
+
         participant: Participant = self.__participant_db.get(participant_name)
 
         course_start, course_end = course.get_time_room()
 
         participant.book_time(course_start, course_end, course_title)
 
-        course.add_participant(participant_name, self.__participant_db)
+
 
 
     def show_course(self, persons_type: str, course_name: str):
