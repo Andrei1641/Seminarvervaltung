@@ -1,9 +1,12 @@
 import unittest
 
+from classes.data_time import DateTim
+from factories.course_factory import CourseFactory
+from factories.date_time_factory import DateTimeFactory
 from factories.persons_factory import PersonFactory
 
 
-class PersonIni(unittest.TestCase):
+class PersonTest(unittest.TestCase):
     #all func are adjusted for persons
     def test_name(self):
         test_cases = [('', 'Sor'),('And', ''),('', '')]
@@ -25,3 +28,21 @@ class PersonIni(unittest.TestCase):
         #email with small letters
         person = PersonFactory.create_participant('vorname', 'nachname', 'MaiL@gmail.com')
         self.assertIn('Email-Adresse: mail@gmail.com', str(person))
+
+
+
+    def setUp(self):
+        self.person = PersonFactory.create_participant('N', 'N', 'd@')
+
+
+
+    def test_get_dict(self):
+        d_person1 = self.person.get_dict()
+
+        d_await1: dict = {'N N' : {'first name' : 'N',
+                                 'second name' : 'N',
+                                 'email address' : 'd@',}
+                        }
+
+        self.assertEqual(d_await1, d_person1)
+

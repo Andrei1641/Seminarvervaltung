@@ -172,6 +172,9 @@ class Information(Serializable):
 
         docent: Docent = self.__docent_db.get(docent_name)
 
+        if not docent:
+            raise ValueError(f'there is no such a docent: {docent_name}, there are: {self.__docent_db.get_names()}')
+
         course_start, course_end = course.get_time_room()
 
         docent.book_time(course_start, course_end, course_title)
@@ -187,11 +190,12 @@ class Information(Serializable):
 
         participant: Participant = self.__participant_db.get(participant_name)
 
+        if not participant:
+            raise ValueError(f'there is no such a docent: {participant_name}, there are: {self.__participant_db.get_names()}')
+
         course_start, course_end = course.get_time_room()
 
         participant.book_time(course_start, course_end, course_title)
-
-
 
 
     def show_course(self, persons_type: str, course_name: str):

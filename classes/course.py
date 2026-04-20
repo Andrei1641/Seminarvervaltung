@@ -61,8 +61,6 @@ class Course(Nameable, Serializable):
 
         docent = docent_db.get(docent_name)
 
-
-
         if not docent:
             raise ValueError(f'there is no such a docent: {docent_name}, there are: {docent_db.get_names()}')
 

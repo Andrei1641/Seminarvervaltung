@@ -1,15 +1,17 @@
 import unittest
 
+from classes.course import Course
 from classes.db import DataBase
 from classes.person_classen import Participant, Docent
 from factories.persons_factory import PersonFactory
 from factories.course_factory import CourseFactory
 
 
-class SeminarTest(unittest.TestCase):
+class CourseTest(unittest.TestCase):
     def setUp(self):
         max_p: int = 9
-        self.sem = CourseFactory.create_course('Math', '2005-10-30-20-43-43', 30, max_p, 'klass 25')
+        self.course1: Course = CourseFactory.create_course('Math', '2005-10-30-20-43-43', 30, max_p, 'klass 25')
+        self.course2: Course = CourseFactory.create_course('Bio', '2005-10-30-20-0-0', 30, max_p, 'klass 25')
 
         self.db_p: DataBase = DataBase()
         self.db_d: DataBase = DataBase()
@@ -30,39 +32,37 @@ class SeminarTest(unittest.TestCase):
         #it`s not a database with participant
         with self.assertRaises(ValueError):
             participant_from_db1 = self.db1[0].get_name()
-            self.sem.add_participant(participant_from_db1, self.db_d)
+            self.course1.add_participant(participant_from_db1, self.db_d)
 
         #unknown participant
         with self.assertRaises(ValueError):
-            self.sem.add_participant(participant_from_db1 + "vde", self.db_p)
+            self.course1.add_participant(participant_from_db1 + "vde", self.db_p)
 
         #too many participant
         with self.assertRaises(OverflowError):
             for i in self.db1:
-                self.sem.add_participant(i.get_name(), self.db_p)
+                self.course1.add_participant(i.get_name(), self.db_p)
 
 
     def test_add_docent(self):
         #it`s not a database with docents
         with self.assertRaises(ValueError):
-            self.sem.add_docent(self.db2[0].get_name(), self.db_p)
+            self.course1.add_docent(self.db2[0].get_name(), self.db_p)
 
         #unknown docent
         with self.assertRaises(ValueError):
-            self.sem.add_docent(self.db2[0].get_name() + "vde", self.db_d)
+            self.course1.add_docent(self.db2[0].get_name() + "vde", self.db_d)
 
         #too many docents
         with self.assertRaises(OverflowError):
             for i in self.db2:
-                self.sem.add_docent(i.get_name(), self.db_d)
+                self.course1.add_docent(i.get_name(), self.db_d)
 
     def test_seminar_str(self):
-        semimar = CourseFactory.create_course('Titel Name', '2005-10-30-20-43-43', 10, 10, 'klass 25')
+        result = str(self.course1)
 
-        result = str(semimar)
-
-        self.assertIn('Titel: Titel Name\n', result)
+        self.assertIn('Titel: Math\n', result)
         self.assertIn('Datum: 2005-10-30 um 20:43:43 Uhr\n', result)
-        self.assertIn('Dauer: 10 Minuten\n', result)
+        self.assertIn('Dauer: 30 Minuten\n', result)
         self.assertIn('Ort: klass 25\n', result)
-        self.assertIn('Plätze: 0 von 10 belegt\n', result)
+        self.assertIn('Plätze: 0 von 9 belegt\n', result)

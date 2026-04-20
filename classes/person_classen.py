@@ -20,7 +20,7 @@ class Person(ABC):
     #         end: DateTim = DateTimeFactory.create_date_time(i[1])
     #         self._booked_time.append((start, end, i[2]))
 
-    def find_time(self, start_time: DateTim, end_time: DateTim):
+    def _find_time(self, start_time: DateTim, end_time: DateTim):
         time = (start_time, end_time)
 
         l = 0
@@ -40,12 +40,12 @@ class Person(ABC):
         return mid, 1
 
     def free_up_time(self, time_room):
-        place, state = self.find_time(time_room[0], time_room[1])
+        place, state = self._find_time(time_room[0], time_room[1])
         if not state:
             self._booked_time.pop(place)
 
     def book_time(self, start_time: DateTim, end_time: DateTim, course_name: str):
-        place, state = self.find_time(start_time, end_time)
+        place, state = self._find_time(start_time, end_time)
 
         if place == -1:
             self._booked_time.append((start_time, end_time, course_name))
@@ -53,7 +53,6 @@ class Person(ABC):
             self._booked_time.insert(place, (start_time, end_time, course_name))
         else:
             raise ValueError(f'this person is already on course: {self._booked_time[place][2]}')
-
 
 
     def get_name(self) -> str:
