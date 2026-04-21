@@ -15,6 +15,12 @@ while True:
 
         if query == 'end':
             break
+        elif query == 'save':
+            j: dict = information.get_dict()
+            if j:
+                with open('data.json', "w") as f:
+                    json.dump(j, f, indent=4)
+
 
         query_modules: list[str] = shlex.split(query)
 
@@ -61,8 +67,8 @@ while True:
     except Exception as e:
         print('something gone wrong')
 
-j: dict = information.get_dict()
 
+j: dict = information.get_dict()
 if j:
     with open('data.json', "w") as f:
         json.dump(j, f, indent=4)
