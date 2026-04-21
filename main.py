@@ -4,6 +4,13 @@ from collector import Information
 import shlex
 
 
+def save(info: Information):
+    j: dict = info.get_dict()
+    if j:
+        with open('data.json', "w") as f:
+            json.dump(j, f, indent=4)
+
+
 information = Information()
 
 information.deserialize()
@@ -11,16 +18,13 @@ information.deserialize()
 
 while True:
     try:
-        query: str = str(input('write your query: '))
+        query: str = str(input('write your query: ')).strip()
 
         if query == 'end':
             break
-        elif query == 'save':
-            j: dict = information.get_dict()
-            if j:
-                with open('data.json', "w") as f:
-                    json.dump(j, f, indent=4)
-
+        if query == 'save':
+            save(information)
+            continue
 
         query_modules: list[str] = shlex.split(query)
 
@@ -68,7 +72,4 @@ while True:
         print('something gone wrong')
 
 
-j: dict = information.get_dict()
-if j:
-    with open('data.json', "w") as f:
-        json.dump(j, f, indent=4)
+save(information)
