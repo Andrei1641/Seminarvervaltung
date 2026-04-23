@@ -2,19 +2,19 @@ class DateTim:
     def __init__(self, year: int, month: int, day: int, hour: int, minute: int, second: int):
         '''YYYY-MM-DD-HH-MM-SS'''
 
-        self.__year = year
-        self.__month = month
-        self.__day = day
-        self.__hour = hour
-        self.__minute = minute
-        self.__second = second
+        self.__year: int = year
+        self.__month: int = month
+        self.__day: int = day
+        self.__hour: int = hour
+        self.__minute: int = minute
+        self.__second: int = second
 
 
     def __str__(self) -> str:
         return f'{self.__year}-{self.__month}-{self.__day}-{self.__hour}-{self.__minute}-{self.__second}'
 
 
-    def __eq__(self, other: 'DateTim'):
+    def __eq__(self, other: 'DateTim') -> bool:
         if not isinstance(other, DateTim):
             raise TypeError('Cannot compare DateTime with non-DateTime object')
 

@@ -20,7 +20,7 @@ class Person(ABC):
     #         end: DateTim = DateTimeFactory.create_date_time(i[1])
     #         self._booked_time.append((start, end, i[2]))
 
-    def _find_time(self, start_time: DateTim, end_time: DateTim):
+    def _find_time(self, start_time: DateTim, end_time: DateTim) -> tuple[int, int]:
         time = (start_time, end_time)
 
         l = 0
@@ -39,7 +39,7 @@ class Person(ABC):
                 return mid, 0
         return mid, 1
 
-    def free_up_time(self, time_room):
+    def free_up_time(self, time_room: tuple[DateTim, DateTim]):
         place, state = self._find_time(time_room[0], time_room[1])
         if not state:
             self._booked_time.pop(place)
@@ -65,7 +65,7 @@ class Person(ABC):
         return f'{name}\n{email}\n'
 
 
-    def get_dict(self) -> dict:
+    def get_dict(self) -> dict[str, dict]:
         # serialized__booked_time: list[tuple] = []
         # if self._booked_time:
         #     for i in self._booked_time:
@@ -101,7 +101,7 @@ class Docent(Person, Nameable, Serializable):
         return f'{base_str}{role}\n{theme}\n'
 
 
-    def get_dict(self) -> dict:
+    def get_dict(self) -> dict[str, dict]:
         docent_dict = super().get_dict()
         docent_dict[self.get_name()]['theme'] = self.__list_an_themes
 

@@ -3,7 +3,7 @@ from classes.data_time import DateTim
 
 class DateTimeFactory:
     @staticmethod
-    def create_date_time(date_time: str):
+    def create_date_time(date_time: str) -> DateTim:
         s = date_time.split('-')
 
         if len(s) != 6:

@@ -4,7 +4,7 @@ from interfaces.nameable import Nameable
 from classes.person_classen import *
 
 class DataBase:
-    def __init__(self) -> None:
+    def __init__(self):
         self.__db: dict[str, Nameable] = {}
 
     def __len__(self) -> int:

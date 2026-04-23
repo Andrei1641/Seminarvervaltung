@@ -84,7 +84,7 @@ class Information(Serializable):
 
         return all_ob
 
-    def get_dict(self) -> dict:
+    def get_dict(self) -> dict[str, dict]:
         #docent dict
         all_docents: list[Serializable] = Information.__db_get_objects(self.__docent_db)
 
@@ -127,7 +127,7 @@ class Information(Serializable):
 
 
     @staticmethod
-    def __person_daten():
+    def __person_daten() -> tuple[str, str, str]:
         first_name: str = input('Vorname: ')
         second_name: str = input('Nachname: ')
         email_address: str = input('email_address: ')

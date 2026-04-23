@@ -16,10 +16,10 @@ class Course(Nameable, Serializable):
         self.__place: str = place
         self.__docents: DataBase = DataBase()
         self.__participants: DataBase = DataBase()
-        self.__time_room = self.adjust_time_room()
+        self.__time_room: tuple[DateTim, DateTim] = self.adjust_time_room()
 
 
-    def get_time_room(self):
+    def get_time_room(self) -> tuple[DateTim, DateTim]:
         return self.__time_room
 
     def adjust_time_room(self) -> tuple[DateTim, DateTim]:
@@ -31,7 +31,7 @@ class Course(Nameable, Serializable):
 
         return course_start, course_end
 
-    def get_dict(self) -> dict:
+    def get_dict(self) -> dict[str, dict]:
 
 
         course_dict: dict = {
@@ -96,10 +96,10 @@ class Course(Nameable, Serializable):
     def get_name(self) -> str:
         return self.__title
 
-    def get_docents_names(self):
+    def get_docents_names(self) -> str:
         return self.__docents.get_names()
 
-    def get_participant_names(self):
+    def get_participant_names(self) -> str:
         return self.__participants.get_names()
 
     def __str__(self) -> str:

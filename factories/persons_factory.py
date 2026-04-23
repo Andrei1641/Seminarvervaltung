@@ -27,13 +27,13 @@ class PersonFactory:
         return email.lower()
 
     @staticmethod
-    def __theme_check(theme: list[str]):
+    def __theme_check(theme: list[str]) -> list[str]:
         if not theme:
             raise ValueError('this dozent can not learn')
         return theme
 
     @staticmethod
-    def __persons_adjustments(first_name: str, second_name: str, email_address: str):
+    def __persons_adjustments(first_name: str, second_name: str, email_address: str) -> tuple[str, str, str]:
         first_name = PersonFactory.__name_check(first_name)
         second_name = PersonFactory.__name_check(second_name)
         email_address = PersonFactory.__email_check(email_address)
