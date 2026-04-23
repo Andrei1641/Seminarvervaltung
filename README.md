@@ -4,26 +4,26 @@
 
 ## Contents
 
-- [Create](#create)
-- [Add](#add)
-- [Show](#show)
-- [Delete](#delete)
-- [Info](#info)
+- [Create](#create-syntaxcreate-new-objects)
+- [Add](#add-syntaxadd-person-to-course-add)
+- [Show](#show-syntaxshow-object-names-or-person-names-inside-course-show)
+- [Delete](#delete-syntaxdelete-course-person-from-course-person-completely-delete)
+- [Info](#info-syntaxshows-detailed-information-about-object-info)
 
-### Create-Syntax(create new objects) {#create}
+### Create-Syntax(create new objects)
 
 ```
 create <type>
 type: {participant | docent | couse}
 ```
 
-### Add-Syntax(add person to course) {#add}
+### Add-Syntax(add person to course)
 ```
 add <person_type> "Second_name First_name" "Title"
 person_type: {participant | docent}
 ```
 
-### Show-Syntax(show object names or person names inside course) {#show}
+### Show-Syntax(show object names or person names inside course)
 
 ```
 show <scope> [arguments]
@@ -45,7 +45,7 @@ show course <person_type> "Title"
 person_type: {participant | docent}
 ```
  
-### Delete-Syntax(delete course, person from course, person completely) {#delete}
+### Delete-Syntax(delete course, person from course, person completely)
 
 ```
 delete <scope> [arguments]
@@ -73,7 +73,7 @@ person_type: {participant | docent}
 delete course "Title"
 ```
 
-### Info-Syntax(shows detailed information about object) {#info}
+### Info-Syntax(shows detailed information about object)
 
 ```
 info <type> "<name>"
