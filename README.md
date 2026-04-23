@@ -5,10 +5,10 @@
 ## Contents
 
 - [Create](#create-syntaxcreate-new-objects)
-- [Add](#add-syntaxadd-person-to-course-add)
-- [Show](#show-syntaxshow-object-names-or-person-names-inside-course-show)
-- [Delete](#delete-syntaxdelete-course-person-from-course-person-completely-delete)
-- [Info](#info-syntaxshows-detailed-information-about-object-info)
+- [Add](#add-syntaxadd-person-to-course)
+- [Show](#show-syntaxshow-object-names-or-person-names-inside-course)
+- [Delete](#delete-syntaxdelete-course-person-from-course-person-completely)
+- [Info](#info-syntaxshows-detailed-information-about-object)
 
 ### Create-Syntax(create new objects)
 
