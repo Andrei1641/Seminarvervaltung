@@ -9,8 +9,8 @@ class PersonFactory:
             raise ValueError('name can not be empty')
 
         for i in name:
-            if i.isdigit():
-                raise ValueError('name can not consist digit')
+            if not i.isalpha():
+                raise ValueError('name can only consist letter')
 
         name = name.strip()
         name = name.capitalize()

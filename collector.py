@@ -136,9 +136,9 @@ class Information(Serializable):
 
     def docent_create(self):
         first_name, second_name, email_address = Information.__person_daten()
-        list_an_themes = input('list an themes(at least one) eingeben: ')
-
-        list_an_themes = list_an_themes.split(', ')
+        list_an_themes = (input('list an themes(at least one) eingeben: ')).strip()
+        if list_an_themes:
+            list_an_themes = list_an_themes.split(', ')
 
         new_dozent = PersonFactory.create_docent(first_name, second_name, email_address, list_an_themes)
         self.__docent_db.insert_in_db(new_dozent)
