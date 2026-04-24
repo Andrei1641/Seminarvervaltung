@@ -33,11 +33,7 @@ class Information(Serializable):
         if data['all docents'] != '':
             for i in data['all docents'].values():
                 docent = PersonFactory.create_docent(i['first name'], i['second name'], i['email address'], i['theme'])
-                # if i['booked time']:
-                #     docent.deserialize_booked_time(i['booked time'])
-
                 self.__docent_db.insert_in_db(docent)
-
 
         if data['all participants'] != '':
             for i in data['all participants'].values():
@@ -71,8 +67,6 @@ class Information(Serializable):
                         self.add_participant_to_course(j, course.get_name())
 
 
-
-
     @staticmethod
     def __db_get_objects(db: DataBase) -> list[Serializable]:
         all_names = db.get_names()
@@ -85,45 +79,30 @@ class Information(Serializable):
         return all_ob
 
     def get_dict(self) -> dict[str, dict]:
-        #docent dict
-        all_docents: list[Serializable] = Information.__db_get_objects(self.__docent_db)
 
-        docents_dict: dict = {'all docents' : {}}
-
-        if all_docents != [0]:
-            for i in all_docents:
-                docents_dict['all docents'].update(i.get_dict())
-        else:
-            docents_dict['all docents'] = ''
-
-
-        #participant dict
-        all_participants: list[Serializable] = Information.__db_get_objects(self.__participant_db)
-
-        participants_dict: dict = {'all participants' : {}}
-
-        if all_participants != [0]:
-            for i in all_participants:
-                participants_dict['all participants'].update(i.get_dict())
-        else:
-            participants_dict['all participants'] = ''
-
-
-        #course dict
-        all_courses: list[Serializable] = Information.__db_get_objects(self.__course_db)
-
-        courses_dict: dict = {'all courses' : {}}
-
-        if all_courses != [0]:
-            for i in all_courses:
-                courses_dict['all courses'].update(i.get_dict())
-        else:
-            courses_dict['all courses'] = ''
+        docents_dict: dict = Information.__get_dict_part(self.__docent_db, 'docents')
+        participants_dict: dict = Information.__get_dict_part(self.__participant_db, 'participants')
+        courses_dict: dict = Information.__get_dict_part(self.__course_db, 'courses')
 
         #serialize
         serialize_dict: dict = docents_dict | participants_dict | courses_dict
 
         return serialize_dict
+
+
+    @staticmethod
+    def __get_dict_part(db: DataBase, t: str) -> dict:
+        all_objects: list[Serializable] = Information.__db_get_objects(db)
+
+        objects_dict: dict = {f'all {t}': {}}
+
+        if all_objects != [0]:
+            for i in all_objects:
+                objects_dict[f'all {t}'].update(i.get_dict())
+        else:
+            objects_dict[f'all {t}'] = ''
+
+        return objects_dict
 
 
     @staticmethod
