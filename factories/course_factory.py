@@ -4,9 +4,17 @@ from factories.date_time_factory import DateTimeFactory
 
 class CourseFactory:
     @staticmethod
-    def create_course(title: str, date: str, duration: int, max_participant_count: int, place: str) -> Course:
+    def create_course(title: str, date: str, duration: str, max_participant_count: str, place: str) -> Course:
+        if not duration.strip():
+            raise ValueError('duration can not be empty')
+        if not max_participant_count.strip():
+            raise ValueError('max participant count can not be empty')
 
-        if not title.strip():
+        max_participant_count = int(max_participant_count)
+        duration = int(duration)
+        title = title.strip()
+
+        if not title:
             raise ValueError('title can not be empty')
         if not place.strip():
             raise ValueError('place can not be empty')
@@ -17,4 +25,4 @@ class CourseFactory:
 
         datetime: DateTim = DateTimeFactory.create_date_time(date.strip())
 
-        return Course(title.strip(), datetime, duration, max_participant_count, place.strip())
+        return Course(title, datetime, duration, max_participant_count, place.strip())

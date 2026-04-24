@@ -154,9 +154,9 @@ class Information(Serializable):
     def course_create(self):
         title: str = input('Titel: ')
         date: str = input('Datum(YYYY-MM-DD-HH-MM-SS): ')
-        duration: int = int(input('Dauer: '))
-        max_participant_count: int = int(input('Maximale Teilnehmerzahl: '))
-        place: str = input('write ort: ')
+        duration = input('Dauer: ')
+        max_participant_count: str = input('Maximale Teilnehmerzahl: ')
+        place: str = input('Ort: ')
 
         new_course = CourseFactory.create_course(title, date, duration, max_participant_count, place)
         self.__course_db.insert_in_db(new_course)
@@ -191,7 +191,7 @@ class Information(Serializable):
         participant: Participant = self.__participant_db.get(participant_name)
 
         if not participant:
-            raise ValueError(f'there is no such a docent: {participant_name}, there are: {self.__participant_db.get_names()}')
+            raise ValueError(f'there is no such a participant: {participant_name}, there are: {self.__participant_db.get_names()}')
 
         course_start, course_end = course.get_time_room()
 
