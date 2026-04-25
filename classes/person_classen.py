@@ -14,11 +14,6 @@ class Person(ABC):
         self._booked_time: list[tuple[DateTim, DateTim, str]] = []                #(start_time, end_time, course_name)
 
 
-    # def deserialize_booked_time(self, old_booked_time: list[tuple[str, str, str]]):         # !only sorted!
-    #     for i in old_booked_time:
-    #         start: DateTim = DateTimeFactory.create_date_time(i[0])
-    #         end: DateTim = DateTimeFactory.create_date_time(i[1])
-    #         self._booked_time.append((start, end, i[2]))
 
     def _find_time(self, start_time: DateTim, end_time: DateTim) -> tuple[int, int]:
         time = (start_time, end_time)
@@ -66,17 +61,12 @@ class Person(ABC):
 
 
     def get_dict(self) -> dict[str, dict]:
-        # serialized__booked_time: list[tuple] = []
-        # if self._booked_time:
-        #     for i in self._booked_time:
-        #         serialized__booked_time.append((str(i[0]), str(i[1]), i[2]))
 
         d: dict = {
                                 self.get_name() : {
                                                     'first name' : self._first_name,
                                                     'second name' : self._second_name,
                                                     'email address' : self._email_address,
-                                                    # 'booked time' : serialized__booked_time
                                                   }
                              }
         return d

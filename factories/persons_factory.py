@@ -5,7 +5,8 @@ class PersonFactory:
 
     @staticmethod
     def __name_check(name: str) -> str:
-        if not name.strip():
+        name = name.strip()
+        if not name:
             raise ValueError('name can not be empty')
 
         for i in name:

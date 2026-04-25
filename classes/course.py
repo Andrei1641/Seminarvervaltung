@@ -14,8 +14,8 @@ class Course(Nameable, Serializable):
         self.__duration: int = duration      #min
         self.__max_participant_count: int = max_participant_count
         self.__place: str = place
-        self.__docents: DataBase = DataBase()
-        self.__participants: DataBase = DataBase()
+        self.__docents: DataBase = DataBase(Docent)
+        self.__participants: DataBase = DataBase(Participant)
         self.__time_room: tuple[DateTim, DateTim] = self.adjust_time_room()
 
 
@@ -54,9 +54,8 @@ class Course(Nameable, Serializable):
 
     def add_docent(self, docent_name: str, docent_db: DataBase):
 
-        if docent_db.get_type() != Docent:
-            raise ValueError(f'it`s not a database with docents')
-        elif len(self.__docents) >= 2:
+
+        if len(self.__docents) >= 2:
             raise OverflowError(f'the seminar "{self.__title}" is already full for docents')
 
         docent = docent_db.get(docent_name)
@@ -68,10 +67,7 @@ class Course(Nameable, Serializable):
 
 
     def add_participant(self, participant_name: str, participant_db: DataBase):
-
-        if participant_db.get_type() != Participant:
-            raise ValueError(f'it`s not a database with participant')
-        elif len(self.__participants) >= self.__max_participant_count:
+        if len(self.__participants) >= self.__max_participant_count:
             raise OverflowError(f'the seminar "{self.__title}" is already full for participant')
 
         participant = participant_db.get(participant_name)

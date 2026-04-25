@@ -1,22 +1,23 @@
 import json
 import os.path
 from json import JSONDecodeError
-import copy
 
-from classes.data_time import DateTim
-from classes.person_classen import Docent, Participant
 from classes.course import Course
-from factories.persons_factory import PersonFactory
-from factories.course_factory import CourseFactory
-from classes.db import DataBase
-from interfaces.serializable import Serializable
+from classes.person_classen import Participant, Docent, Person
+from managers import Manager
 
 
-class Information(Serializable):
-    def __init__(self):
-        self.__docent_db = DataBase()
-        self.__participant_db = DataBase()
-        self.__course_db = DataBase()
+class Information:
+    def __init__(self, managers: list[Manager]):
+        self.__managers = managers
+        self.class_map: dict = {'participant' : Participant, 'course': Course, 'docent': Docent}
+
+
+    def serialize(self):
+        d: dict = self.get_dict()
+        if d:
+            with open('data.json', "w") as f:
+                json.dump(d, f, indent=4)
 
 
     def deserialize(self):
@@ -30,226 +31,68 @@ class Information(Serializable):
         else:
             return
 
-        if data['all docents'] != '':
-            for i in data['all docents'].values():
-                docent = PersonFactory.create_docent(i['first name'], i['second name'], i['email address'], i['theme'])
-                self.__docent_db.insert_in_db(docent)
+        #persons
+        person_roles: dict = data['persons']
 
-        if data['all participants'] != '':
-            for i in data['all participants'].values():
-                participant = PersonFactory.create_participant(i['first name'], i['second name'], i['email address'])
-                self.__participant_db.insert_in_db(participant)
+        for i in person_roles.keys():
+            role = i
+            role = role[4:len(role)-1]
+            for persons in person_roles[i]:
+                f = []
+                for feature in person_roles[i][persons].values():
+                    f.append(feature)
 
-        if data['all courses'] != '':
-            for i in data['all courses'].values():
-                course_info = i['course info']
-                course: Course = CourseFactory.create_course(course_info['title'], course_info['date'], course_info['duration'],
-                                                             course_info['max participant count'], course_info['place'])
+                self.find_manager(role, 'create', *f)
 
-                self.__course_db.insert_in_db(course)
+        #courses
+        course_types: dict = data['courses']
 
-                persons_inside = i['persons inside']
+        for i in course_types.keys():
+            courses = i
+            courses = courses[4:len(courses)-1]
+            for course in course_types[i].values():
+                course_info: dict = course['course info']
 
-                # add docents
-                docents_inside: str = persons_inside['docents']
-                docent_name_inside: list[str] = docents_inside.split(', ')
+                info = []
+                for inf in course_info.values():
+                    info.append(inf)
+                self.find_manager(courses, 'create', *info)
 
-                if docent_name_inside != ['']:
-                    for j in docent_name_inside:
-                        self.add_docent_to_course(j, course.get_name())
+                persons_inside: dict = course['persons inside']
 
-                #add participants
-                participants_inside: str = persons_inside['participants']
-                participant_name_inside: list[str] = participants_inside.split(', ')
+                person_role_names = []
+                for per in persons_inside.items():
+                    person_role_names.append(per)
 
-                if participant_name_inside != ['']:
-                    for j in participant_name_inside:
-                        self.add_participant_to_course(j, course.get_name())
+                for role, names in person_role_names:
+                    names = names.split(', ')
+                    role = role[:-1]
+                    if names != ['']:
+                        for n in names:
+                            self.find_manager(role, 'add', n, course['course info']['title'])
 
 
-    @staticmethod
-    def __db_get_objects(db: DataBase) -> list[Serializable]:
-        all_names = db.get_names()
-        all_names = all_names.split(', ')
-        all_ob: list[Serializable] = []
 
-        for i in all_names:
-            all_ob.append(db.get(i))
 
-        return all_ob
+    def get_dict(self) -> dict:
+        d = {
+            "persons": {},
+            "courses": {}
+        }
 
-    def get_dict(self) -> dict[str, dict]:
+        for manager in self.__managers:
+            if issubclass(manager.get_type(), Person):
+                d["persons"].update(manager.get_dict())
+            else:
+                d["courses"].update(manager.get_dict())
 
-        docents_dict: dict = Information.__get_dict_part(self.__docent_db, 'docents')
-        participants_dict: dict = Information.__get_dict_part(self.__participant_db, 'participants')
-        courses_dict: dict = Information.__get_dict_part(self.__course_db, 'courses')
+        return d
 
-        #serialize
-        serialize_dict: dict = docents_dict | participants_dict | courses_dict
 
-        return serialize_dict
+    def find_manager(self, t: str, *args):
+        typ: type = self.class_map[t]
 
-
-    @staticmethod
-    def __get_dict_part(db: DataBase, t: str) -> dict:
-        all_objects: list[Serializable] = Information.__db_get_objects(db)
-
-        objects_dict: dict = {f'all {t}': {}}
-
-        if all_objects != [0]:
-            for i in all_objects:
-                objects_dict[f'all {t}'].update(i.get_dict())
-        else:
-            objects_dict[f'all {t}'] = ''
-
-        return objects_dict
-
-
-    @staticmethod
-    def __person_daten() -> tuple[str, str, str]:
-        first_name: str = input('Vorname: ')
-        second_name: str = input('Nachname: ')
-        email_address: str = input('email_address: ')
-        return first_name, second_name, email_address
-
-
-    def docent_create(self):
-        first_name, second_name, email_address = Information.__person_daten()
-        list_an_themes = (input('list an themes(at least one) eingeben: ')).strip()
-        if list_an_themes:
-            list_an_themes = list_an_themes.split(', ')
-
-        new_dozent = PersonFactory.create_docent(first_name, second_name, email_address, list_an_themes)
-        self.__docent_db.insert_in_db(new_dozent)
-
-
-    def participant_create(self):
-        first_name, second_name, email_address = Information.__person_daten()
-
-        new_participant = PersonFactory.create_participant(first_name, second_name, email_address)
-        self.__participant_db.insert_in_db(new_participant)
-
-
-    def course_create(self):
-        title: str = input('Titel: ')
-        date: str = input('Datum(YYYY-MM-DD-HH-MM-SS): ')
-        duration = input('Dauer: ')
-        max_participant_count: str = input('Maximale Teilnehmerzahl: ')
-        place: str = input('Ort: ')
-
-        new_course = CourseFactory.create_course(title, date, duration, max_participant_count, place)
-        self.__course_db.insert_in_db(new_course)
-
-
-    def add_docent_to_course(self, docent_name: str, course_title: str):
-        course: Course = self.__course_db.get(course_title)
-        if not course:
-            raise ValueError(f'there is no such a course: {course_title}, there are: {self.__course_db.get_names()}')
-
-        #book time docent
-        course.add_docent(docent_name, self.__docent_db)
-
-        docent: Docent = self.__docent_db.get(docent_name)
-
-        if not docent:
-            raise ValueError(f'there is no such a docent: {docent_name}, there are: {self.__docent_db.get_names()}')
-
-        course_start, course_end = course.get_time_room()
-
-        docent.book_time(course_start, course_end, course_title)
-
-
-    def add_participant_to_course(self, participant_name: str, course_title: str):
-        course: Course = self.__course_db.get(course_title)
-        if not course:
-            raise ValueError(f'there is no such a course: {course_title}, there are: {self.__course_db.get_names()}')
-
-        # book time participant
-        course.add_participant(participant_name, self.__participant_db)
-
-        participant: Participant = self.__participant_db.get(participant_name)
-
-        if not participant:
-            raise ValueError(f'there is no such a participant: {participant_name}, there are: {self.__participant_db.get_names()}')
-
-        course_start, course_end = course.get_time_room()
-
-        participant.book_time(course_start, course_end, course_title)
-
-
-    def show_course(self, persons_type: str, course_name: str):
-        if persons_type == 'participant':
-            course: Course = self.__course_db.get(course_name)
-            print(course.get_participant_names())
-        if persons_type == 'docent':
-            course: Course = self.__course_db.get(course_name)
-            print(course.get_docents_names())
-
-
-    def show_all(self, db_type: str):
-        if db_type == 'participant':
-            print(self.__participant_db.get_names())
-        if db_type == 'docent':
-            print(self.__docent_db.get_names())
-        if db_type == 'course':
-            print(self.__course_db.get_names())
-
-
-    def delete_from_course(self, person_type: str, person_name: str, course_name: str):
-        if person_type == 'participant':
-            course: Course = self.__course_db.get(course_name)
-            course.delete_participant(person_name)
-        if person_type == 'docent':
-            course: Course = self.__course_db.get(course_name)
-            course.delete_docent(person_name)
-
-
-    def delete_from_db(self, person_type: str, person_name: str):
-        if person_type == 'participant':
-            self.__participant_db.pop(person_name)
-            seminar_names = self.__course_db.get_names()
-
-            if seminar_names:
-                seminar_names = seminar_names.split(', ')
-                #can be optimized (each person has name of course,that he visit)
-                for name in seminar_names:
-                    s_db: Course = self.__course_db.get(name)
-                    s_db.delete_participant(person_name)
-
-        if person_type == 'docent':
-            self.__docent_db.pop(person_name)
-            seminar_names = self.__course_db.get_names()
-            if seminar_names:
-                seminar_names = seminar_names.split(', ')
-                # can be optimized (each person has name of course,that he visit)
-                for name in seminar_names:
-                    s_db: Course = self.__course_db.get(name)
-                    s_db.delete_docent(person_name)
-
-
-    def delete_course(self, course_title: str):
-        course: Course = self.__course_db.get(course_title)
-
-        docents_names: str = course.get_docents_names()
-        d = docents_names.split(', ')
-        for i in d:
-            self.delete_from_course('docent', i, course_title)
-
-        participants_names: str = course.get_participant_names()
-        p = participants_names.split(', ')
-        for i in p:
-            self.delete_from_course('participant', i, course_title)
-
-        self.__course_db.pop(course_title)
-
-
-    def info_docent(self, docent_name: str):
-        print(self.__docent_db.get(docent_name))
-
-
-    def info_participant(self, participant_name: str):
-        print(self.__participant_db.get(participant_name))
-
-
-    def info_course(self, course_name: str):
-        print(self.__course_db.get(course_name))
+        #can be optimized
+        for i in self.__managers:
+            if typ == i.get_type():
+                i.find_func(*args)

@@ -3,73 +3,32 @@ import json
 from collector import Information
 import shlex
 
+from managers import ParticipantManager, CourseManager, DocentManager, Manager
 
-def save(info: Information):
-    j: dict = info.get_dict()
-    if j:
-        with open('data.json', "w") as f:
-            json.dump(j, f, indent=4)
+curse_manager = CourseManager()
+docent_manager = DocentManager(curse_manager.get_db())
+participant_manager = ParticipantManager(curse_manager.get_db())
 
+managers: list = [curse_manager, docent_manager, participant_manager]
 
-information = Information()
+information = Information(managers)
 
 information.deserialize()
 
-
 while True:
-    try:
-        query: str = str(input('write your query: ')).strip()
+    query: str = str(input('write your query: ')).strip()
 
-        if query == 'end':
-            break
-        if query == 'save':
-            save(information)
-            continue
+    query_modules: list[str] = shlex.split(query)
 
-        query_modules: list[str] = shlex.split(query)
+    t = query_modules[0]
 
-        action = query_modules[0]
-        target = query_modules[1]
-        args = query_modules[2:]
+    if t == 'save':
+        information.serialize()
+        continue
+    if t == 'end':
+        information.serialize()
+        break
 
-        states: dict = {
-                        'create' : {
-                                    'docent' : information.docent_create,
-                                    'participant' : information.participant_create,
-                                    'course' : information.course_create
-                                    },
-                        'add':     {
-                                    'docent' : information.add_docent_to_course,
-                                    'participant' : information.add_participant_to_course
-                                    },
-                        'show':    {
-                                    'all' : information.show_all,
-                                    'course' : information.show_course
-                                   },
-                        'delete':   {
-                                    'from_db' : information.delete_from_db,
-                                    'from_course' : information.delete_from_course,
-                                    'course' : information.delete_course
-                                    },
-                        'info':     {
-                                    'docent' : information.info_docent,
-                                    'participant' : information.info_participant,
-                                    'course' : information.info_course
-                                    }
-                        }
+    args = query_modules[1:]
 
-        states[action][target](*args)
-
-    except ValueError as e:
-        print(e)
-    except OverflowError as e:
-        print(e)
-    except IndexError:
-        print('the query is not full')
-    except TypeError:
-        print('the query is not full')
-    except Exception as e:
-        print('something gone wrong')
-
-
-save(information)
+    information.find_manager(t, *args)
