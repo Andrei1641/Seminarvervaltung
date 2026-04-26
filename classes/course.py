@@ -8,16 +8,17 @@ from interfaces.serializable import Serializable
 
 
 class Course(Nameable, Serializable):
-    def __init__(self, title: str, date: DateTim, duration: int, max_participant_count: int, place: str):
+    def __init__(self, title: str, date: DateTim, duration: int, max_participant_count: int, place: str, persons: dict[str, list[str]], max_count: dict[str, int]):
         self.__title: str = title
         self.__date: DateTim = date
-        self.__duration: int = duration      #min
-        self.__max_participant_count: int = max_participant_count
+        self.__duration: int = duration      #minute
         self.__place: str = place
-        self.__docents: DataBase = DataBase(Docent)
-        self.__participants: DataBase = DataBase(Participant)
+        self.__persons: dict[str, list[str]] = persons
+        self.__max_counts: dict[str, int] = max_count
         self.__time_room: tuple[DateTim, DateTim] = self.adjust_time_room()
 
+    def get_persons_t(self):
+        return self.__persons.keys()
 
     def get_time_room(self) -> tuple[DateTim, DateTim]:
         return self.__time_room
@@ -40,71 +41,52 @@ class Course(Nameable, Serializable):
                                                                         'title' : self.__title,
                                                                         'date' : str(self.__date),
                                                                         'duration' : self.__duration,
-                                                                        'max participant count' : self.__max_participant_count,
+                                                                        'max participant count' : self.__max_counts['participant'],
                                                                         'place' : self.__place
                                                                     },
                                                     'persons inside' : {
-                                                                        'docents' : self.__docents.get_names(),
-                                                                        'participants' : self.__participants.get_names()
+                                                                        'docents' : self.__persons['docent'],
+                                                                        'participants' : self.__persons['participant']
                                                                        }
                                                  }
                              }
 
         return course_dict
 
-    def add_docent(self, docent_name: str, docent_db: DataBase):
+
+    def add_person(self, name: str, db: DataBase, person_t: str):
+        if len(self.__persons[person_t]) >= 2:
+            raise OverflowError(f'the seminar "{self.__title}" is already full for {person_t}s')
+
+        person = db.get(name)
+
+        if not person:
+            raise ValueError(f'there is no such a {person_t}: {name}, there are: {db.get_names()}')
+
+        self.__persons[person_t].append(person.get_name())
 
 
-        if len(self.__docents) >= 2:
-            raise OverflowError(f'the seminar "{self.__title}" is already full for docents')
+    def delete_person(self, name: str, person_t: str):
+        # docent: Docent = self.__docents.get(docent_name)
+        # docent.free_up_time(self.__time_room)
+        self.__persons[person_t].remove(name)
 
-        docent = docent_db.get(docent_name)
-
-        if not docent:
-            raise ValueError(f'there is no such a docent: {docent_name}, there are: {docent_db.get_names()}')
-
-        self.__docents.insert_in_db(docent)
-
-
-    def add_participant(self, participant_name: str, participant_db: DataBase):
-        if len(self.__participants) >= self.__max_participant_count:
-            raise OverflowError(f'the seminar "{self.__title}" is already full for participant')
-
-        participant = participant_db.get(participant_name)
-
-        if not participant:
-            raise ValueError(f'there is no such a participant: {participant_name}, there are: {participant_db.get_names()}')
-
-        self.__participants.insert_in_db(participant)
-
-
-    def delete_docent(self, docent_name: str):
-        docent: Docent = self.__docents.get(docent_name)
-        docent.free_up_time(self.__time_room)
-        self.__docents.pop(docent_name)
-
-
-    def delete_participant(self, participant_name: str):
-        participant: Participant = self.__participants.get(participant_name)
-        participant.free_up_time(self.__time_room)
-        self.__participants.pop(participant_name)
 
     def get_name(self) -> str:
         return self.__title
 
-    def get_docents_names(self) -> str:
-        return self.__docents.get_names()
 
-    def get_participant_names(self) -> str:
-        return self.__participants.get_names()
+    def get_person_names(self, person_t: str) -> str:
+        return ', '.join(self.__persons[person_t])
+
 
     def __str__(self) -> str:
         title = f'Titel: {self.__title}'
-        docents = f'Dozierend: {self.__docents.get_names()}'
+        docents = f'Dozierend: {self.get_person_names('docent')}'
         d = str(self.__date).split('-')
         date = f'Datum: {d[0]}-{d[1]}-{d[2]} um {d[3]}:{d[4]}:{d[5]} Uhr'
         duration = f'Dauer: {self.__duration} Minuten'
         place = f'Ort: {self.__place}'
-        pl = f'Plätze: {len(self.__participants)} von {self.__max_participant_count} belegt'
+        pl = f'Plätze: {len(self.__persons['participant'])} von {self.__max_counts['participant']} belegt'
 
         return f'{title}\n{docents}\n{date}\n{duration}\n{place}\n{pl}\n'

@@ -15,7 +15,6 @@ class DataBase:
         self.__db[obj.get_name()] = obj
 
 
-
     def pop(self, name: str):
         self.__db.pop(name, None)
 

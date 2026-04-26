@@ -75,6 +75,38 @@ class PersonManager(Manager):
         email_address: str = input('email_address: ')
         return first_name, second_name, email_address
 
+    @staticmethod
+    def _ad(name: str, title: str, db: DataBase, course_db: DataBase, person_t: str):
+        course: Course = course_db.get(title)
+        if not course:
+            raise ValueError(f'there is no such a course: {title}, there are: {course_db.get_names()}')
+
+        # book time person
+        course.add_person(name, db, person_t)
+
+        person = db.get(name)
+
+        if not person:
+            raise ValueError(
+                f'there is no such a {person_t}: {name}, there are: {db.get_names()}')
+
+        course_start, course_end = course.get_time_room()
+
+        person.book_time(course_start, course_end, title)
+
+
+    @staticmethod
+    def _del_from_db(name: str, db: DataBase, course_db: DataBase, person_t: str):
+        db.pop(name)
+        course_names = course_db.get_names()
+
+        if course_names:
+            course_names = course_names.split(', ')
+            # can be optimized (each person has name of course,that he visit)
+            for name in course_names:
+                s_db: Course = course_db.get(name)
+                s_db.delete_person(name, person_t)
+
 
     @abstractmethod
     def create(self, first_name = '', second_name = '', email_address = ''):
@@ -103,7 +135,7 @@ class PersonManager(Manager):
 
 class ParticipantManager(PersonManager):
     def __init__(self, course: DataBase):
-        self.__type = Participant
+        self.__type: type = Participant
         self.__db: DataBase = DataBase(Participant)
         self.__course_db: DataBase = course
 
@@ -126,27 +158,12 @@ class ParticipantManager(PersonManager):
 
 
     def add(self, name: str, title: str):
-        course: Course = self.__course_db.get(title)
-        if not course:
-            raise ValueError(f'there is no such a course: {title}, there are: {self.__course_db.get_names()}')
-
-        # book time person
-        course.add_participant(name, self.__db)
-
-        participant = self.__db.get(name)
-
-        if not participant:
-            raise ValueError(
-                f'there is no such a participant: {name}, there are: {self.__db.get_names()}')
-
-        course_start, course_end = course.get_time_room()
-
-        participant.book_time(course_start, course_end, title)
+        ParticipantManager._ad(name, title, self.__db, self.__course_db, 'participant')
 
 
     def delete_from_course(self, name: str, title: str):
         course: Course = self.__course_db.get(title)
-        course.delete_participant(name)
+        course.delete_person(name, 'participant')
 
 
     def show(self):
@@ -154,15 +171,7 @@ class ParticipantManager(PersonManager):
 
 
     def delete_from_db(self, name: str):
-        self.__db.pop(name)
-        course_names = self.__course_db.get_names()
-
-        if course_names:
-            course_names = course_names.split(', ')
-            # can be optimized (each person has name of course,that he visit)
-            for name in course_names:
-                s_db: Course = self.__course_db.get(name)
-                s_db.delete_participant(name)
+        ParticipantManager._del_from_db(name, self.__db, self.__course_db, 'participant')
 
 
     def info(self, name: str):
@@ -195,39 +204,16 @@ class DocentManager(PersonManager):
 
 
     def add(self, name: str, title: str):
-        course: Course = self.__course_db.get(title)
-        if not course:
-            raise ValueError(f'there is no such a course: {title}, there are: {self.__course_db.get_names()}')
-
-        # book time person
-        course.add_docent(name, self.__db)
-
-        docent = self.__db.get(name)
-
-        if not docent:
-            raise ValueError(
-                f'there is no such a docent: {name}, there are: {self.__db.get_names()}')
-
-        course_start, course_end = course.get_time_room()
-
-        docent.book_time(course_start, course_end, title)
+        DocentManager._ad(name, title, self.__db, self.__course_db, 'docent')
 
 
     def delete_from_course(self, name: str, title: str):
         course: Course = self.__course_db.get(title)
-        course.delete_docent(name)
+        course.delete_person(name, 'docent')
 
 
     def delete_from_db(self, name: str):
-        self.__db.pop(name)
-        course_names = self.__course_db.get_names()
-
-        if course_names:
-            course_names = course_names.split(', ')
-            # can be optimized (each person has name of course,that he visit)
-            for name in course_names:
-                s_db: Course = self.__course_db.get(name)
-                s_db.delete_docent(name)
+        DocentManager._del_from_db(name, self.__db, self.__course_db, 'docent')
 
 
     def show(self):
@@ -294,25 +280,23 @@ class CourseManager(Manager):
     def show_inside(self, title: str):
         course: Course = self.__db.get(title)
 
-        print(course.get_participant_names())
-        print(course.get_docents_names())
+        person_t = course.get_persons_t()
+
+        for t in person_t:
+            print(f'{t} = {course.get_person_names(t)}')
 
 
     def delete(self, title: str):
         course: Course = self.__db.get(title)
 
-        docents_names: str = course.get_docents_names()
-        d = docents_names.split(', ')
+        person_t = course.get_persons_t()
 
-        course: Course = self.__db.get(title)
+        for t in person_t:
+            names: str = course.get_person_names(t)
+            d = names.split(', ')
 
-        for i in d:
-            course.delete_docent(i)
-
-        participants_names: str = course.get_participant_names()
-        p = participants_names.split(', ')
-        for i in p:
-            course.delete_participant(i)
+            for i in d:
+                course.delete_person(i, t)
 
         self.__db.pop(title)
 

@@ -10,7 +10,7 @@ from managers import Manager
 class Information:
     def __init__(self, managers: list[Manager]):
         self.__managers = managers
-        self.class_map: dict = {'participant' : Participant, 'course': Course, 'docent': Docent}
+        self.__class_map: dict[str, type] = {'participant' : Participant, 'course': Course, 'docent': Docent}
 
 
     def serialize(self):
@@ -50,26 +50,26 @@ class Information:
         for i in course_types.keys():
             courses = i
             courses = courses[4:len(courses)-1]
-            for course in course_types[i].values():
-                course_info: dict = course['course info']
+            if course_types['all courses'] != '':
+                for course in course_types[i].values():
+                    course_info: dict = course['course info']
 
-                info = []
-                for inf in course_info.values():
-                    info.append(inf)
-                self.find_manager(courses, 'create', *info)
+                    info = []
+                    for inf in course_info.values():
+                        info.append(inf)
+                    self.find_manager(courses, 'create', *info)
 
-                persons_inside: dict = course['persons inside']
+                    persons_inside: dict = course['persons inside']
 
-                person_role_names = []
-                for per in persons_inside.items():
-                    person_role_names.append(per)
+                    person_role_names = []
+                    for per in persons_inside.items():
+                        person_role_names.append(per)
 
-                for role, names in person_role_names:
-                    names = names.split(', ')
-                    role = role[:-1]
-                    if names != ['']:
-                        for n in names:
-                            self.find_manager(role, 'add', n, course['course info']['title'])
+                    for role, names in person_role_names:
+                        role = role[:-1]
+                        if names != ['']:
+                            for n in names:
+                                self.find_manager(role, 'add', n, course['course info']['title'])
 
 
 
@@ -90,7 +90,7 @@ class Information:
 
 
     def find_manager(self, t: str, *args):
-        typ: type = self.class_map[t]
+        typ: type = self.__class_map[t]
 
         #can be optimized
         for i in self.__managers:
