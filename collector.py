@@ -66,7 +66,6 @@ class Information:
                         person_role_names.append(per)
 
                     for role, names in person_role_names:
-                        role = role[:-1]
                         if names != ['']:
                             for n in names:
                                 self.find_manager(role, 'add', n, course['course info']['title'])

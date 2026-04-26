@@ -45,11 +45,13 @@ class Course(Nameable, Serializable):
                                                                         'place' : self.__place
                                                                     },
                                                     'persons inside' : {
-                                                                        'docents' : self.__persons['docent'],
-                                                                        'participants' : self.__persons['participant']
+                                                 #                        'docents' : self.__persons['docent'],
+                                                 #                        'participants' : self.__persons['participant']
                                                                        }
                                                  }
                              }
+        for person_t, names in self.__persons.items():
+            course_dict[f'{self.get_name()}']['persons inside'].update({person_t : names})
 
         return course_dict
 
