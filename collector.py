@@ -4,7 +4,7 @@ from json import JSONDecodeError
 
 from classes.course import Course
 from classes.person_classen import Participant, Docent, Person
-from managers import Manager
+from interfaces.manager import Manager
 
 
 class Information:

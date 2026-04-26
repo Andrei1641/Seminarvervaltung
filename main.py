@@ -1,9 +1,8 @@
-import json
-
 from collector import Information
 import shlex
 
-from managers import ParticipantManager, CourseManager, DocentManager, Manager
+from managers.course_managers import CourseManager
+from managers.person_managers import DocentManager, ParticipantManager
 
 curse_manager = CourseManager()
 docent_manager = DocentManager(curse_manager.get_db())
