@@ -12,8 +12,13 @@ class DateTimeFactory:
         for i in s:
             if not i.isdigit():
                 raise ValueError('date can not consist letter')
-            if int(i) <= 0:
-                raise ValueError('date period can not be less than 1')
+            if int(i) < 0:
+                raise ValueError('date period(year, month, day, hour, minute, second) can not be less than 0')
+
+        for i in s[:3]:
+            if int(i) < 0:
+                raise ValueError('date period(year, month, day) can not be less than 1')
+
 
         #year
         if len(s[0]) != 4:

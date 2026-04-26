@@ -10,9 +10,9 @@ class SeminarIniTest(unittest.TestCase):
 
         for i in titel:
             with self.assertRaises(ValueError):
-                CourseFactory.create_course(i, '2005-10-30-20-43-43', 30, 10, 'klass 25')
+                CourseFactory.create_course(i, '2005-10-30-20-43-43', '30', '10', 'klass 25')
 
 
     def test_ints_init(self):
         with self.assertRaises(ValueError):
-            CourseFactory.create_course('Titel Name', '2005-10-30-20-43-43', -1, 10, 'klass 25')
+            CourseFactory.create_course('Titel Name', '2005-10-30-20-43-43', '-1', '10', 'klass 25')

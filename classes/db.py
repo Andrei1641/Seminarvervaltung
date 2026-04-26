@@ -19,7 +19,7 @@ class DataBase:
         self.__db.pop(name, None)
 
     def get_type(self) -> type:
-        return type(self.__type)
+        return self.__type
 
     def get(self, name):
         return self.__db.get(name, 0)

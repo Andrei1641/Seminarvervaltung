@@ -16,19 +16,32 @@ information = Information(managers)
 information.deserialize()
 
 while True:
-    query: str = str(input('write your query: ')).strip()
+    try:
+        query: str = str(input('write your query: ')).strip()
 
-    query_modules: list[str] = shlex.split(query)
+        query_modules: list[str] = shlex.split(query)
 
-    t = query_modules[0]
+        if not query_modules:
+            raise ValueError('query can not be empty')
 
-    if t == 'save':
-        information.serialize()
-        continue
-    if t == 'end':
-        information.serialize()
-        break
+        t = query_modules[0]
 
-    args = query_modules[1:]
+        if t == 'save':
+            information.serialize()
+            continue
+        if t == 'end':
+            information.serialize()
+            break
 
-    information.find_manager(t, *args)
+        if len(query_modules) < 2:
+            raise ValueError('incorrect query')
+
+        args = query_modules[1:]
+
+        information.find_manager(t, *args)
+    except ValueError as e:
+        print(e)
+    except OverflowError as e:         #?
+        print(e)
+    except Exception:
+        print("something gone wrong")
