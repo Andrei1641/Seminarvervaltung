@@ -51,6 +51,8 @@ class Manager(ABC):
 
 class PersonManager(Manager):
 
+    person_managers: dict = {}
+
     def find_func(self, *args):
         action = args[0]
         if action == 'create':
@@ -105,8 +107,12 @@ class PersonManager(Manager):
             # can be optimized (each person has name of course,that he visit)
             for name in course_names:
                 s_db: Course = course_db.get(name)
-                s_db.delete_person(name, person_t)
+                s_db.delete_person(name, person_t, db)
 
+
+    @abstractmethod
+    def get_db(self) -> DataBase:
+        ...
 
     @abstractmethod
     def create(self, first_name = '', second_name = '', email_address = ''):
@@ -138,7 +144,11 @@ class ParticipantManager(PersonManager):
         self.__type: type = Participant
         self.__db: DataBase = DataBase(Participant)
         self.__course_db: DataBase = course
+        ParticipantManager.person_managers.update({'participant':self})
 
+
+    def get_db(self) -> DataBase:
+        return self.__db
 
     def get_type(self) -> type:
         return self.__type
@@ -163,7 +173,7 @@ class ParticipantManager(PersonManager):
 
     def delete_from_course(self, name: str, title: str):
         course: Course = self.__course_db.get(title)
-        course.delete_person(name, 'participant')
+        course.delete_person(name, 'participant', self.__db)
 
 
     def show(self):
@@ -181,11 +191,21 @@ class ParticipantManager(PersonManager):
 class DocentManager(PersonManager):
     def __init__(self, course: DataBase):
         self.__type = Docent
+        self.__type_str = 'docent'
         self.__db: DataBase = DataBase(Docent)
         self.__course_db: DataBase = course
+        DocentManager.person_managers.update({'docent':self})
+
+    def get_type_str(self):
+        return self.__type_str
+
+    def get_db(self) -> DataBase:
+        return self.__db
+
 
     def get_type(self) -> type:
         return self.__type
+
 
     def get_dict(self) -> dict:
         d = DocentManager._get_d(self.__db, 'docents')
@@ -209,7 +229,7 @@ class DocentManager(PersonManager):
 
     def delete_from_course(self, name: str, title: str):
         course: Course = self.__course_db.get(title)
-        course.delete_person(name, 'docent')
+        course.delete_person(name, 'docent', self.__db)
 
 
     def delete_from_db(self, name: str):
@@ -288,15 +308,17 @@ class CourseManager(Manager):
 
     def delete(self, title: str):
         course: Course = self.__db.get(title)
-
+        managers = PersonManager.person_managers
         person_t = course.get_persons_t()
 
         for t in person_t:
+            manager = managers.get(t)
+
             names: str = course.get_person_names(t)
             d = names.split(', ')
-
-            for i in d:
-                course.delete_person(i, t)
+            if d != ['']:
+                for i in d:
+                    course.delete_person(i, t, manager.get_db())
 
         self.__db.pop(title)
 

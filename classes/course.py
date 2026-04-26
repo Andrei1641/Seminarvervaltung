@@ -8,7 +8,7 @@ from interfaces.serializable import Serializable
 
 
 class Course(Nameable, Serializable):
-    def __init__(self, title: str, date: DateTim, duration: int, max_participant_count: int, place: str, persons: dict[str, list[str]], max_count: dict[str, int]):
+    def __init__(self, title: str, date: DateTim, duration: int, place: str, persons: dict[str, list[str]], max_count: dict[str, int]):
         self.__title: str = title
         self.__date: DateTim = date
         self.__duration: int = duration      #minute
@@ -55,7 +55,7 @@ class Course(Nameable, Serializable):
 
 
     def add_person(self, name: str, db: DataBase, person_t: str):
-        if len(self.__persons[person_t]) >= 2:
+        if len(self.__persons[person_t]) >= self.__max_counts[person_t]:
             raise OverflowError(f'the seminar "{self.__title}" is already full for {person_t}s')
 
         person = db.get(name)
@@ -66,9 +66,9 @@ class Course(Nameable, Serializable):
         self.__persons[person_t].append(person.get_name())
 
 
-    def delete_person(self, name: str, person_t: str):
-        # docent: Docent = self.__docents.get(docent_name)
-        # docent.free_up_time(self.__time_room)
+    def delete_person(self, name: str, person_t: str, db: DataBase):
+        person = db.get(name)
+        person.free_up_time(self.__time_room)
         self.__persons[person_t].remove(name)
 
 

@@ -30,4 +30,4 @@ class CourseFactory:
         persons: dict[str, list[str]] = {'participant' : [], 'docent' : []}
         max_count: dict[str, int] = {'participant' : max_participant_count, 'docent' : 2}
 
-        return Course(title, datetime, duration, max_participant_count, place.strip(), persons, max_count)
+        return Course(title, datetime, duration, place.strip(), persons, max_count)
